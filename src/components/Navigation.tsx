@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Menu, Hotel } from 'lucide-react';
+import { Menu, Hotel, Wine } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface NavigationProps {
