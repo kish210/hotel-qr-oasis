@@ -1,6 +1,8 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Download } from 'lucide-react';
 
 const MenuSection = () => {
   const menuCategories = [
@@ -31,33 +33,63 @@ const MenuSection = () => {
     }
   ];
 
+  const downloadExcel = () => {
+    // Create CSV content (Excel compatible)
+    let csvContent = "نام غذا,توضیحات,قیمت,دسته‌بندی\n";
+    
+    menuCategories.forEach(category => {
+      category.items.forEach(item => {
+        csvContent += `"${item.name}","${item.description}","${item.price}","${category.title}"\n`;
+      });
+    });
+
+    // Create and download file
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'menu-restaurant.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-navy-900 p-4" style={{background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #1e3a8a 100%)'}}>
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-amber-800 mb-4">منوی رستوران</h1>
-          <p className="text-lg text-amber-600">بهترین غذاهای ایرانی و بین‌المللی</p>
+          <h1 className="text-4xl font-bold text-white mb-4">منوی رستوران</h1>
+          <p className="text-lg text-slate-300 mb-6">بهترین غذاهای ایرانی و بین‌المللی</p>
+          
+          <Button 
+            onClick={downloadExcel}
+            className="bg-blue-900 hover:bg-blue-800 text-white border border-blue-700"
+          >
+            <Download className="w-4 h-4 mr-2" />
+            دانلود فایل Excel
+          </Button>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8">
           {menuCategories.map((category, index) => (
-            <Card key={index} className="bg-white/90 backdrop-blur-sm shadow-xl border-amber-200 hover:shadow-2xl transition-all duration-300">
-              <CardHeader className="bg-gradient-to-r from-amber-100 to-orange-100">
-                <CardTitle className="text-2xl text-amber-800 text-center">
+            <Card key={index} className="bg-black/70 backdrop-blur-sm shadow-2xl border-slate-700 hover:shadow-blue-900/50 transition-all duration-300">
+              <CardHeader className="bg-gradient-to-r from-slate-800 to-blue-900">
+                <CardTitle className="text-2xl text-white text-center">
                   {category.title}
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-6">
                 <div className="space-y-4">
                   {category.items.map((item, itemIndex) => (
-                    <div key={itemIndex} className="border-b border-amber-100 pb-4 last:border-b-0">
+                    <div key={itemIndex} className="border-b border-slate-600 pb-4 last:border-b-0">
                       <div className="flex justify-between items-start mb-2">
-                        <h3 className="text-lg font-semibold text-amber-800">{item.name}</h3>
-                        <Badge variant="secondary" className="bg-amber-100 text-amber-800">
+                        <h3 className="text-lg font-semibold text-white">{item.name}</h3>
+                        <Badge variant="secondary" className="bg-blue-900 text-blue-100 border-blue-700">
                           {item.price}
                         </Badge>
                       </div>
-                      <p className="text-amber-600 text-sm">{item.description}</p>
+                      <p className="text-slate-300 text-sm">{item.description}</p>
                     </div>
                   ))}
                 </div>
