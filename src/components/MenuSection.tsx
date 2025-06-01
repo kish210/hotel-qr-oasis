@@ -1,11 +1,22 @@
-
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
+import CSVUploader from './CSVUploader';
+
+interface MenuItem {
+  name: string;
+  description: string;
+  price: string;
+  category: string;
+}
 
 const MenuSection = () => {
-  const menuCategories = [
+  const [csvData, setCsvData] = useState<MenuItem[]>([]);
+  
+  const defaultMenuCategories = [
+    
     {
       title: "پیش غذاها",
       items: [
@@ -33,8 +44,36 @@ const MenuSection = () => {
     }
   ];
 
+  const handleCSVDataLoaded = (data: MenuItem[]) => {
+    setCsvData(data);
+    console.log('Menu data loaded from CSV:', data);
+  };
+
+  const getMenuCategories = () => {
+    if (csvData.length > 0) {
+      const categoriesMap = new Map();
+      
+      csvData.forEach(item => {
+        if (!categoriesMap.has(item.category)) {
+          categoriesMap.set(item.category, []);
+        }
+        categoriesMap.get(item.category).push({
+          name: item.name,
+          description: item.description,
+          price: item.price
+        });
+      });
+
+      return Array.from(categoriesMap.entries()).map(([title, items]) => ({
+        title,
+        items
+      }));
+    }
+    return defaultMenuCategories;
+  };
+
   const downloadExcel = () => {
-    // Create CSV content (Excel compatible)
+    const menuCategories = getMenuCategories();
     let csvContent = "نام غذا,توضیحات,قیمت,دسته‌بندی\n";
     
     menuCategories.forEach(category => {
@@ -43,7 +82,6 @@ const MenuSection = () => {
       });
     });
 
-    // Create and download file
     const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
@@ -54,6 +92,8 @@ const MenuSection = () => {
     link.click();
     document.body.removeChild(link);
   };
+
+  const menuCategories = getMenuCategories();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-navy-900 p-4" style={{background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #1e3a8a 100%)'}}>
@@ -70,6 +110,8 @@ const MenuSection = () => {
             دانلود فایل Excel
           </Button>
         </div>
+
+        <CSVUploader onDataLoaded={handleCSVDataLoaded} />
 
         <div className="grid lg:grid-cols-2 gap-8">
           {menuCategories.map((category, index) => (
